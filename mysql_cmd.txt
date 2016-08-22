@@ -1,0 +1,25 @@
+CREATE DATABASE IF NOT EXISTS weibo DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+create table weibos(
+   Publish_Time VARCHAR(40) ,
+   weibo_URL VARCHAR(100) NOT NULL ,
+   Sina_Weibo_ID VARCHAR(100) NOT NULL,
+   weibo_Text text NOT NULL,
+   Pic_URL_List text,
+   Publisher_Name VARCHAR(50) ,
+   Publisher_Main_URL VARCHAR(100) ,
+   Collect_Time DATE,
+   Recommend_Number INT,
+   Comment_Number INT,
+   Like_Number INT,
+   PRIMARY KEY ( Sina_Weibo_ID )
+);
+create table comments(
+   Sina_Weibo_ID VARCHAR(100) NOT NULL,
+   weibo_URL VARCHAR(100) NOT NULL ,
+   comment_id VARCHAR(100) NOT NULL,
+   Commenter_Main_URL VARCHAR(100) ,
+   Commenter_Name VARCHAR(50) ,
+   Comment_date DATE,
+   Comment_Text text NOT NULL,
+   PRIMARY KEY ( comment_id )
+);
