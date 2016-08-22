@@ -12,12 +12,13 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 import csv
 import sys
+import getpass
 csv.field_size_limit(sys.maxsize)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-WEIBO_NAME = '18801095156'
-WEIBO_PASSWORD = 'srcjw1129'
+WEIBO_NAME = ''
+WEIBO_PASSWORD = ''
 WEIBO_USER = '阿文' #微博昵称，用于验证是否登录成功
 MYSQL_USER='root'
 MYSQL_PASSWORD='123456'
@@ -27,38 +28,42 @@ ONE_URL_LOAD_TIME = 3 #一个url如果访问失败应该尝试的次数
 PAGE_TIMEOUT = 20 #selenium默认的访问一个页面的超时时间（秒）
 SAVE_TO_CSV = True
 
-def login(driver):
+def login(driver,weibo_name,weibo_password):
     '''登录新浪通信证页面'''
     driver.get(r'https://login.sina.com.cn/signup/signin.php?entry=sso')
     user_name = driver.find_element_by_xpath('//*[@id="username"]')
     pass_word = driver.find_element_by_xpath('//*[@id="password"]')
     user_name.clear()
     pass_word.clear()
-    user_name.send_keys(WEIBO_NAME)
-    pass_word.send_keys(WEIBO_PASSWORD)
+    user_name.send_keys(weibo_name)
+    pass_word.send_keys(weibo_password)
     login = driver.find_element_by_xpath('//*[@class="btn_submit_m"]')
     login.click()
     time.sleep(10)
-    if WEIBO_USER in driver.page_source :
+    if WEIBO_USER in driver.page_source or weibo_name in driver.page_source:
         print u'登陆成功'
         return True
     else:
         print u'登录失败'
         return False
 
-def login_new(driver):
+def login_new(driver,weibo_name,weibo_password):
     '''登录新浪通信证页面'''
+    # #先在命令行获取用户名和密码
+    # WEIBO_NAME = raw_input("input weibo username:")
+    # WEIBO_PASSWORD = getpass.getpass()
+
     driver.get(r'https://login.sina.com.cn/')
     user_name = driver.find_element_by_xpath('//*[@id="username"]')
     pass_word = driver.find_element_by_xpath('//*[@id="password"]')
     user_name.clear()
     pass_word.clear()
-    user_name.send_keys(WEIBO_NAME)
-    pass_word.send_keys(WEIBO_PASSWORD)
+    user_name.send_keys(weibo_name)
+    pass_word.send_keys(weibo_password)
     login = driver.find_element_by_xpath('//input[@class="smb_btn"]')
     login.click()
     time.sleep(5)
-    if WEIBO_USER in driver.page_source :
+    if WEIBO_USER in driver.page_source or weibo_name in driver.page_source:
         print u'登陆成功'
         return True
     else:
@@ -401,12 +406,15 @@ def crawl_all(driver):
         crawl_one(url,driver)
 
 def main():
+    # 先在命令行获取用户名和密码
+    weibo_name = raw_input("input weibo username:")
+    weibo_password = getpass.getpass()
     driver = webdriver.Firefox() #打开driver
     # driver = webdriver.Chrome('C:\Program Files (x86)\Google\Chrome\Application\chrome.exe')
     # driver = webdriver.PhantomJS(executable_path='F:/runtime/python/phantomjs-2.1.1-windows/bin/phantomjs.exe')
     driver.set_page_load_timeout(PAGE_TIMEOUT)
     # is_login = login(driver) #首先模拟登陆
-    is_login = login_new(driver)  # 首先模拟登陆
+    is_login = login_new(driver,weibo_name,weibo_password)  # 首先模拟登陆
     if not is_login:
         return
     crawl_all(driver)
